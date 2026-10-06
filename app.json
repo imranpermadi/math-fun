@@ -15,6 +15,11 @@
       "adaptiveIcon": {
         "backgroundColor": "#2E9E6B"
       }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5e99ea15-7c10-4812-a669-1042bbdae453"
+      }
     }
   }
 }

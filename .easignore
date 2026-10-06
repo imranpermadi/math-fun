@@ -1,0 +1,7 @@
+node_modules/
+.expo/
+.agents/
+*.pdf
+scripts/
+__tests__/
+.tmp-*
