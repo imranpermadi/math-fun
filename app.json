@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Math Fun",
+    "slug": "math-fun",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "plugins": [
+      "expo-sqlite",
+      "expo-asset",
+      "expo-font"
+    ],
+    "android": {
+      "package": "com.mathfun.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#2E9E6B"
+      }
+    }
+  }
+}
