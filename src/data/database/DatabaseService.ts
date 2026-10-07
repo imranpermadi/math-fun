@@ -41,6 +41,10 @@ const MIGRATIONS: string[] = [
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
   `,
+  `
+  ALTER TABLE player_profile ADD COLUMN age INTEGER NOT NULL DEFAULT 7;
+  ALTER TABLE player_profile ADD COLUMN avatar TEXT NOT NULL DEFAULT '🧒';
+  `,
 ];
 
 export class DatabaseService {

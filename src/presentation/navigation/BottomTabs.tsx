@@ -5,11 +5,13 @@ import { colors, fontSize, radius } from '../theme';
 import { MateriScreen } from '../screens/materi/MateriScreen';
 import { BankSoalScreen } from '../screens/bank-soal/BankSoalScreen';
 import { GamesScreen } from '../screens/games/GamesScreen';
+import { ProfileScreen } from '../screens/profile/ProfileScreen';
 
 export type RootTabParamList = {
   Materi: undefined;
   BankSoal: undefined;
   Games: undefined;
+  Profile: undefined;
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -18,6 +20,7 @@ const TABS = [
   { name: 'Materi', label: 'Materi', emoji: '📖', color: colors.sky, component: MateriScreen },
   { name: 'BankSoal', label: 'Bank Soal', emoji: '📝', color: colors.secondary, component: BankSoalScreen },
   { name: 'Games', label: 'Games', emoji: '🎮', color: colors.pink, component: GamesScreen },
+  { name: 'Profile', label: 'Profil', emoji: '👤', color: colors.purple, component: ProfileScreen },
 ] as const;
 
 function TabIcon({ emoji, color, focused }: { emoji: string; color: string; focused: boolean }) {
@@ -71,4 +74,3 @@ const styles = StyleSheet.create({
   iconWrap: { width: 48, height: 40, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
   emoji: { fontSize: 26 },
 });
-
