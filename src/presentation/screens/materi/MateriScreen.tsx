@@ -6,6 +6,7 @@ import { Question } from '../../../domain/entities/Question';
 import { Difficulty } from '../../../domain/enums';
 import { questionGenerator } from '../../../core/di/container';
 import { useAppStore } from '../../stores/useAppStore';
+import { SoundService } from '../../../core/sound/SoundService';
 import { colors, fontSize, radius, spacing } from '../../theme';
 
 const OPS: { op: Operation; label: string; sign: string; emoji: string }[] = [
@@ -18,12 +19,24 @@ const OPS: { op: Operation; label: string; sign: string; emoji: string }[] = [
 const MAX_ICONS = 20;
 
 function Dates({ n, dim }: { n: number; dim?: boolean }) {
+  const [counted, setCounted] = useState(0);
+  const tap = () => {
+    const next = counted >= n ? 1 : counted + 1;
+    setCounted(next);
+    SoundService.pop();
+    SoundService.speak(String(next));
+  };
   return (
     <View style={styles.dates}>
       {Array.from({ length: Math.min(n, MAX_ICONS) }, (_, i) => (
-        <Animated.Text key={i} entering={ZoomIn.delay(i * 40)} style={[styles.date, dim && { opacity: 0.35 }]}>🟤</Animated.Text>
+        <Pressable key={i} onPress={tap} hitSlop={4}>
+          <Animated.Text entering={ZoomIn.delay(i * 40)} style={[styles.date, dim && { opacity: 0.35 }, i < counted && styles.counted]}>
+            {i < counted ? '🟠' : '🟤'}
+          </Animated.Text>
+        </Pressable>
       ))}
       {n > MAX_ICONS && <Text style={styles.more}>+{n - MAX_ICONS}</Text>}
+      {counted > 0 && <Text style={styles.more}>= {counted}</Text>}
     </View>
   );
 }
@@ -97,6 +110,7 @@ const styles = StyleSheet.create({
   q: { fontSize: fontSize.body, color: colors.text, lineHeight: 26 },
   dates: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
   date: { fontSize: 26 },
+  counted: { transform: [{ scale: 1.25 }] },
   more: { fontSize: 18, fontWeight: '800', alignSelf: 'center' },
   sign: { fontSize: 28, fontWeight: '800', color: colors.primaryDark },
   answerHint: { fontSize: 28, fontWeight: '800', color: colors.accent },

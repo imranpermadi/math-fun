@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { GAMES } from '../../games/registry';
+import { SoundService } from '../../../core/sound/SoundService';
 import { colors, fontSize, radius, spacing } from '../../theme';
+
+const TAB_BAR_SPACE = 84;
 
 export function GamesScreen() {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -10,7 +13,11 @@ export function GamesScreen() {
 
   if (active) {
     const Game = active.Component;
-    return <Game key={active.id} onExit={() => setActiveId(null)} />;
+    return (
+      <View style={{ flex: 1, paddingBottom: TAB_BAR_SPACE, backgroundColor: colors.background }}>
+        <Game key={active.id} onExit={() => setActiveId(null)} />
+      </View>
+    );
   }
 
   return (
@@ -19,11 +26,10 @@ export function GamesScreen() {
       <View style={styles.grid}>
         {GAMES.map((g, i) => (
           <Animated.View key={g.id} entering={FadeInDown.delay(i * 50)} style={styles.cell}>
-            <Pressable onPress={() => setActiveId(g.id)} style={[styles.card, { backgroundColor: g.color }]}>
+            <Pressable onPress={() => { SoundService.tap(); setActiveId(g.id); }} style={[styles.card, { backgroundColor: g.color }]}>
               <Text style={styles.emoji}>{g.emoji}</Text>
               <Text style={styles.title}>{g.title}</Text>
               <Text style={styles.concept}>{g.concept}</Text>
-              {!g.playable && <Text style={styles.badge}>Segera</Text>}
             </Pressable>
           </Animated.View>
         ))}
@@ -42,5 +48,4 @@ const styles = StyleSheet.create({
   emoji: { fontSize: 44 },
   title: { fontSize: 16, fontWeight: '800', color: colors.text, textAlign: 'center', marginTop: 6 },
   concept: { fontSize: 13, color: colors.text, textAlign: 'center', opacity: 0.8 },
-  badge: { marginTop: 6, backgroundColor: '#fff', borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 2, fontSize: 12, fontWeight: '800', overflow: 'hidden' },
 });

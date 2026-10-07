@@ -127,6 +127,36 @@ export class QuestionGeneratorService {
     return Number.isFinite(value) && value === question.answer;
   }
 
+  /**
+   * Multiple choice options for a question: the correct answer plus plausible
+   * wrong ones (off-by-one/two/ten, wrong-operation result). Shuffled, unique, > 0.
+   */
+  generateChoices(question: Question, count = 3): number[] {
+    const [a, b] = question.operands;
+    const ans = question.answer;
+    const candidates = [
+      ans + 1, ans - 1, ans + 2, ans - 2, ans + 10, ans - 10,
+      a + b, Math.abs(a - b), a * b,
+    ];
+    const pool = Array.from(new Set(candidates.filter((c) => c > 0 && c !== ans)));
+    // shuffle pool then take what we need
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(this.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    const choices = [ans, ...pool.slice(0, count - 1)];
+    let bump = 3;
+    while (choices.length < count) {
+      if (!choices.includes(ans + bump)) choices.push(ans + bump);
+      bump++;
+    }
+    for (let i = choices.length - 1; i > 0; i--) {
+      const j = Math.floor(this.random() * (i + 1));
+      [choices[i], choices[j]] = [choices[j], choices[i]];
+    }
+    return choices;
+  }
+
   private buildOperands(op: Operation, spec: Spec): [number, number, number] {
     switch (op) {
       case Operation.Addition: {

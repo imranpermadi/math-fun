@@ -8,7 +8,8 @@
     "plugins": [
       "expo-sqlite",
       "expo-asset",
-      "expo-font"
+      "expo-font",
+      "expo-audio"
     ],
     "android": {
       "package": "com.mathfun.app",
