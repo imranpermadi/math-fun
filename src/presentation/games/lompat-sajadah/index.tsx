@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import Animated, {
-  useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming,
+  BounceIn,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 import { GameShell, RoundApi } from '../../components/play/GameShell';
 import { Choices } from '../../components/play/Choices';
@@ -52,8 +57,24 @@ function Round({ grade, onCorrect, onWrong }: RoundApi) {
         <Animated.Text style={[styles.kid, { width: tileW }, kid]}>🧒</Animated.Text>
         <View style={styles.row}>
           {q.seq.map((n, i) => (
-            <View key={i} style={[styles.tile, { width: tileW, backgroundColor: TILE_COLORS[i % TILE_COLORS.length] }]}>
-              <Text style={styles.tileText}>{i === 5 && !revealed ? '?' : n}</Text>
+            <View
+              key={i}
+              style={[
+                styles.tile,
+                {
+                  width: tileW,
+                  backgroundColor: i === 5 && revealed ? '#2E9E6B' : TILE_COLORS[i % TILE_COLORS.length],
+                },
+                i === 5 && revealed && styles.revealedTile,
+              ]}
+            >
+              {i === 5 && revealed ? (
+                <Animated.Text entering={BounceIn.springify()} style={[styles.tileText, { color: '#FFE600' }]}>
+                  {n}
+                </Animated.Text>
+              ) : (
+                <Text style={styles.tileText}>{i === 5 && !revealed ? '?' : n}</Text>
+              )}
             </View>
           ))}
         </View>
@@ -77,5 +98,14 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 6 },
   tile: { aspectRatio: 0.8, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 5, borderBottomColor: 'rgba(0,0,0,0.2)' },
   tileText: { fontSize: 22, fontWeight: '900', color: '#fff' },
+  revealedTile: {
+    borderWidth: 3,
+    borderColor: '#FFE600',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+  },
   hint: { textAlign: 'center', color: colors.textMuted, fontWeight: '700', fontSize: 13 },
 });
