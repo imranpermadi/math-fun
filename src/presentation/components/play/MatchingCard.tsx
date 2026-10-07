@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   BounceIn,
@@ -11,7 +11,33 @@ import { MatchPair } from '../../../domain/entities/ExamQuestion';
 import { SoundService } from '../../../core/sound/SoundService';
 import { colors, radius, spacing } from '../../theme';
 
-const MATCH_COLORS = ['#3A86FF', '#FB5607', '#06D6A0', '#8338EC'];
+const MATCH_COLORS = ['#3A86FF', '#FB5607', '#06D6A0', '#8338EC', '#FF006E'];
+
+/**
+ * Fisher-Yates shuffle with guaranteed derangement:
+ * Ensures NO item in the right column sits at the exact same row/index as the left column!
+ */
+function shufflePairs(items: MatchPair[]): MatchPair[] {
+  if (items.length <= 1) return [...items];
+
+  const shuffled = [...items];
+
+  for (let attempt = 0; attempt < 20; attempt++) {
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    // Verify none of the items are at the same row as the original
+    const hasSamePosition = shuffled.some((item, idx) => item.id === items[idx].id);
+    if (!hasSamePosition) {
+      return shuffled;
+    }
+  }
+
+  // Fallback guaranteed derangement (cyclic shift by 1 or 2)
+  return [...items.slice(1), items[0]];
+}
 
 interface Props {
   pairs: MatchPair[];
@@ -22,11 +48,16 @@ interface Props {
 export function MatchingCard({ pairs, onCorrect, onWrong }: Props) {
   const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
   const [matchedIds, setMatchedIds] = useState<Set<string>>(new Set());
-  const [shuffledRight] = useState(() =>
-    [...pairs].sort(() => Math.random() - 0.5)
-  );
+  const [shuffledRight, setShuffledRight] = useState<MatchPair[]>(() => shufflePairs(pairs));
 
   const shake = useSharedValue(0);
+
+  // Re-shuffle and reset state whenever question pairs change
+  useEffect(() => {
+    setShuffledRight(shufflePairs(pairs));
+    setSelectedLeft(null);
+    setMatchedIds(new Set());
+  }, [pairs]);
 
   const handleSelectLeft = (id: string) => {
     if (matchedIds.has(id)) return;
@@ -71,7 +102,7 @@ export function MatchingCard({ pairs, onCorrect, onWrong }: Props) {
     <Animated.View style={[styles.container, animStyle]}>
       <Text style={styles.hint}>
         {isAllMatched
-          ? 'Alhamdulillah, semua pasangan sudah cocok! 🎉'
+          ? 'Alhamdulillah, semua 4 pasangan sudah cocok! 🎉'
           : selectedLeft
           ? 'Sekarang pilih jawaban pasangannya di kolom kanan 👉'
           : 'Ketuk soal di sebelah kiri terlebih dahulu 👈'}
@@ -112,9 +143,9 @@ export function MatchingCard({ pairs, onCorrect, onWrong }: Props) {
           })}
         </View>
 
-        {/* Right Column (Answers) */}
+        {/* Right Column (Shuffled Answers) */}
         <View style={styles.column}>
-          <Text style={styles.colTitle}>Jawaban</Text>
+          <Text style={styles.colTitle}>Jawaban Acak</Text>
           {shuffledRight.map((p) => {
             const isMatched = matchedIds.has(p.id);
             const originalIndex = pairs.findIndex((orig) => orig.id === p.id);
@@ -128,7 +159,7 @@ export function MatchingCard({ pairs, onCorrect, onWrong }: Props) {
                 style={[
                   styles.card,
                   isMatched && { backgroundColor: matchColor, borderColor: matchColor },
-                  !selectedLeft && !isMatched && { opacity: 0.75 },
+                  !selectedLeft && !isMatched && { opacity: 0.8 },
                 ]}
               >
                 <Text style={[styles.cardText, isMatched && styles.cardTextMatched]}>
@@ -143,7 +174,7 @@ export function MatchingCard({ pairs, onCorrect, onWrong }: Props) {
 
       {isAllMatched && (
         <Animated.View entering={BounceIn} style={styles.successBanner}>
-          <Text style={styles.successBannerText}>Semua Penjodohan Benar! ⭐</Text>
+          <Text style={styles.successBannerText}>Semua 4 Pasangan Cocok! ⭐</Text>
         </Animated.View>
       )}
     </Animated.View>
@@ -152,43 +183,44 @@ export function MatchingCard({ pairs, onCorrect, onWrong }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    gap: spacing.md,
+    gap: spacing.sm,
     width: '100%',
   },
   hint: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '800',
     color: colors.primaryDark,
     textAlign: 'center',
     backgroundColor: '#E8F6FF',
     borderRadius: radius.pill,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 7,
+    paddingHorizontal: 14,
   },
   grid: {
     flexDirection: 'row',
-    gap: spacing.md,
+    gap: 10,
   },
   column: {
     flex: 1,
-    gap: 10,
+    gap: 8,
   },
   colTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '800',
     color: colors.textMuted,
     textAlign: 'center',
     textTransform: 'uppercase',
   },
   card: {
-    minHeight: 64,
+    minHeight: 52,
     backgroundColor: '#fff',
     borderRadius: radius.md,
-    borderWidth: 2.5,
+    borderWidth: 2,
     borderColor: '#E5E7EB',
-    borderBottomWidth: 5,
+    borderBottomWidth: 4,
     borderBottomColor: '#D1D5DB',
-    padding: spacing.sm,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
@@ -201,7 +233,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.03 }],
   },
   cardText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '800',
     color: colors.text,
     textAlign: 'center',
@@ -213,20 +245,20 @@ const styles = StyleSheet.create({
   checkIcon: {
     color: '#fff',
     fontWeight: '900',
-    fontSize: 18,
+    fontSize: 16,
   },
   successBanner: {
     backgroundColor: '#D8F3DC',
     borderRadius: radius.pill,
-    paddingVertical: 12,
+    paddingVertical: 10,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: colors.primaryDark,
+    marginTop: 4,
   },
   successBannerText: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '900',
     color: colors.primaryDark,
   },
 });
-

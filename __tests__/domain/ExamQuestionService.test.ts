@@ -44,10 +44,13 @@ describe('ExamQuestionService', () => {
     expect(correctCount).toBeGreaterThanOrEqual(1);
   });
 
-  test('matching question provides distinct pairs', () => {
-    const q = service.generateQuestion(Grade.Three, Difficulty.Easy, 'match');
-    expect(q.matchPairs).toBeDefined();
-    expect(q.matchPairs!.length).toBeGreaterThanOrEqual(3);
+  test('matching question provides 4 distinct pairs with unique answers across all grades', () => {
+    for (const g of [Grade.One, Grade.Two, Grade.Three]) {
+      const q = service.generateQuestion(g, Difficulty.Easy, 'match');
+      expect(q.matchPairs).toBeDefined();
+      expect(q.matchPairs!.length).toBe(4);
+      const rightValues = new Set(q.matchPairs!.map((p) => p.right));
+      expect(rightValues.size).toBe(4);
+    }
   });
 });
-

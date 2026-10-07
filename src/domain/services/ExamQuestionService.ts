@@ -20,7 +20,6 @@ export class ExamQuestionService {
       list.push(this.generateQuestion(grade, difficulty, type));
     }
 
-    // Shuffle slightly while keeping a nice rhythm
     return list;
   }
 
@@ -110,7 +109,6 @@ export class ExamQuestionService {
       const target = Math.floor(Math.random() * 8) + 12; // 12..19
       const correct1 = `${target - 4} + 4`;
       const correct2 = `${target + 3} - 3`;
-      const correct3 = `${target - 6} + 6`;
       const wrong1 = `${target - 1} + 3`;
       const wrong2 = `${target + 5} - 2`;
 
@@ -161,32 +159,76 @@ export class ExamQuestionService {
   }
 
   /**
-   * Soal Penjodohan (Matching): 3 Pasangan Soal dan Jawaban
+   * Soal Penjodohan (Matching): 4 Pasangan Soal dan Jawaban dengan Hasil Unik
    */
   private generateMatching(id: string, grade: Grade, difficulty: Difficulty): ExamQuestion {
-    let pairs: MatchPair[];
+    const pairs: MatchPair[] = [];
+    const usedAnswers = new Set<string>();
 
     if (grade === Grade.One) {
-      pairs = [
-        { id: 'm1', left: '7 + 5', right: '12' },
-        { id: 'm2', left: '15 - 6', right: '9' },
-        { id: 'm3', left: '10 + 8', right: '18' },
-      ];
+      const candidates = [
+        { left: '8 + 5', right: '13' },
+        { left: '16 − 7', right: '9' },
+        { left: '10 + 8', right: '18' },
+        { left: '15 − 4', right: '11' },
+        { left: '9 + 6', right: '15' },
+        { left: '14 − 6', right: '8' },
+        { left: '7 + 7', right: '14' },
+        { left: '20 − 8', right: '12' },
+        { left: '11 + 6', right: '17' },
+        { left: '18 − 8', right: '10' },
+      ].sort(() => Math.random() - 0.5);
+
+      for (const c of candidates) {
+        if (!usedAnswers.has(c.right)) {
+          usedAnswers.add(c.right);
+          pairs.push({ id: `m${pairs.length + 1}`, left: c.left, right: c.right });
+          if (pairs.length === 4) break;
+        }
+      }
     } else if (grade === Grade.Two) {
-      const a = Math.floor(Math.random() * 3) + 3; // 3..5
-      const b = Math.floor(Math.random() * 3) + 2; // 2..4
-      pairs = [
-        { id: 'm1', left: `${a} × ${b} (penjumlahan berulang)`, right: String(a * b) },
-        { id: 'm2', left: `${a * 10} - ${b * 5}`, right: String(a * 10 - b * 5) },
-        { id: 'm3', left: `${a * 5} + ${b * 10}`, right: String(a * 5 + b * 10) },
-      ];
+      const candidates = [
+        { left: '3 × 4 (penjumlahan berulang)', right: '12' },
+        { left: '25 + 12 (dekomposisi)', right: '37' },
+        { left: '45 − 15', right: '30' },
+        { left: '5 × 5', right: '25' },
+        { left: '4 × 4 (4 + 4 + 4 + 4)', right: '16' },
+        { left: '34 + 15', right: '49' },
+        { left: '60 − 22', right: '38' },
+        { left: '2 × 9', right: '18' },
+        { left: '5 × 4', right: '20' },
+        { left: '50 − 16', right: '34' },
+      ].sort(() => Math.random() - 0.5);
+
+      for (const c of candidates) {
+        if (!usedAnswers.has(c.right)) {
+          usedAnswers.add(c.right);
+          pairs.push({ id: `m${pairs.length + 1}`, left: c.left, right: c.right });
+          if (pairs.length === 4) break;
+        }
+      }
     } else {
-      // Grade 3: Perkalian dan Pembagian
-      pairs = [
-        { id: 'm1', left: '6 × 4', right: '24' },
-        { id: 'm2', left: '20 ÷ 5 (pengurangan berulang)', right: '4' },
-        { id: 'm3', left: '35 ÷ 7', right: '5' },
-      ];
+      // Grade 3
+      const candidates = [
+        { left: '6 × 4', right: '24' },
+        { left: '35 ÷ 5 (pengurangan berulang)', right: '7' },
+        { left: '48 ÷ 6', right: '8' },
+        { left: '7 × 5', right: '35' },
+        { left: '36 ÷ 4', right: '9' },
+        { left: '8 × 4', right: '32' },
+        { left: '54 ÷ 9', right: '6' },
+        { left: '9 × 3', right: '27' },
+        { left: '10 × 5', right: '50' },
+        { left: '40 ÷ 8', right: '5' },
+      ].sort(() => Math.random() - 0.5);
+
+      for (const c of candidates) {
+        if (!usedAnswers.has(c.right)) {
+          usedAnswers.add(c.right);
+          pairs.push({ id: `m${pairs.length + 1}`, left: c.left, right: c.right });
+          if (pairs.length === 4) break;
+        }
+      }
     }
 
     return {
@@ -194,8 +236,8 @@ export class ExamQuestionService {
       type: 'match',
       grade,
       difficulty,
-      topic: 'Penjodohan (Menghubungkan Pasangan)',
-      prompt: 'Jodohkan soal di sebelah kiri dengan nilai hasil yang benar di sebelah kanan!',
+      topic: 'Penjodohan (Menghubungkan 4 Pasangan)',
+      prompt: 'Jodohkan 4 soal di sebelah kiri dengan nilai hasil yang benar di sebelah kanan!',
       hint: 'Ketuk kotak soal di kiri, lalu ketuk jawaban pasangannya di kanan.',
       explanation: pairs.map((p) => `${p.left} = ${p.right}`).join(', '),
       matchPairs: pairs,
@@ -268,4 +310,3 @@ export class ExamQuestionService {
 }
 
 export const examQuestionService = new ExamQuestionService();
-
