@@ -26,7 +26,7 @@
 - **Matching Card**: Permainan mencocokkan pasangan soal matematika dengan jawaban yang tepat.
 - **Riwayat & Statistik Pengerjaan**: Melacak jumlah soal yang dikerjakan, akurasi, dan riwayat jawaban di SQLite.
 
-### 3. 🎮 11 Mini Games Tematik
+### 3. 🎮 12 Mini Games Tematik
 | No | Judul Mini Game | Konsep Matematika |
 |:---:|:---|:---|
 | 1 | 🟤 **Hitung Kurma Sedekah** | Penjumlahan & Pengurangan Cepat |
@@ -40,6 +40,7 @@
 | 9 | 🩴 **Pasangkan Sandal** | Pengenalan Bilangan Ganjil & Genap |
 | 10 | 💎 **Harta Karun Kebaikan** | Pengenalan Pecahan Sederhana |
 | 11 | 🌙 **Tarik Tambang Bulan Hijriah** | Tantangan Hitung Cepat 60 Detik |
+| 12 | ✖️ **Tantangan Hafalan Kali-Kali** | Hafal & Uji Perkalian 1–10 (3D Flashcard, TTS Suara, & Kuis Flame Combo) |
 
 ### 4. 👤 Profil Anak & Gamifikasi
 - Personalisasi profil: Nama, Usia, dan Avatar anak (🧒, 👧, 🦁, 🐼, dll.).
@@ -133,3 +134,4 @@ npm test
 
 ## 📄 Lisensi
 Proyek ini dikembangkan untuk tujuan edukasi anak-anak Indonesia. Hak Cipta © 2026 Imran Permadi.
+

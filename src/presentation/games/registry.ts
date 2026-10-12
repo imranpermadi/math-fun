@@ -11,6 +11,7 @@ import { KeretaUntaBerhitung } from './kereta-unta-berhitung';
 import { PasangkanSandal } from './pasangkan-sandal';
 import { HartaKarunKebaikan } from './harta-karun-kebaikan';
 import { TarikTambangBulanHijriah } from './tarik-tambang-bulan-hijriah';
+import { HafalanPerkalian } from './hafalan-perkalian';
 import { colors } from '../theme';
 
 export interface GameDefinition {
@@ -35,5 +36,6 @@ export const GAMES: GameDefinition[] = [
   { id: 'pasangkan-sandal', title: 'Pasangkan Sandal', emoji: '🩴', concept: 'Ganjil & genap', color: colors.purple, playable: true, Component: PasangkanSandal },
   { id: 'harta-karun-kebaikan', title: 'Harta Karun Kebaikan', emoji: '💎', concept: 'Pecahan (Kelas 3)', color: colors.sky, playable: true, Component: HartaKarunKebaikan },
   { id: 'tarik-tambang-bulan-hijriah', title: 'Tarik Tambang Bulan Hijriah', emoji: '🌙', concept: 'Hitung cepat 60 detik', color: colors.accent, playable: true, Component: TarikTambangBulanHijriah },
+  { id: 'hafalan-perkalian', title: 'Tantangan Hafalan Kali-Kali', emoji: '✖️', concept: 'Hafal & Uji Perkalian 1-10', color: '#4361EE', playable: true, Component: HafalanPerkalian },
 ];
 

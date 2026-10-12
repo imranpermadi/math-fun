@@ -9,6 +9,7 @@ import { useAppStore } from '../../stores/useAppStore';
 import { SoundService } from '../../../core/sound/SoundService';
 import { Choices } from '../../components/play/Choices';
 import { Instruction } from '../../components/play/Instruction';
+import { HafalanPerkalian } from '../../games/hafalan-perkalian';
 import { colors, fontSize, radius, spacing } from '../../theme';
 
 interface OpItem {
@@ -60,6 +61,7 @@ export function MateriScreen() {
   const [selectedOp, setSelectedOp] = useState<Operation>(Operation.Addition);
   const [subTab, setSubTab] = useState<'buku' | 'latihan'>('buku');
   const [step, setStep] = useState(1);
+  const [showHafalan, setShowHafalan] = useState(false);
 
   // Question generator for practice
   const [question, setQuestion] = useState<Question>(() =>
@@ -69,6 +71,14 @@ export function MateriScreen() {
     questionGenerator.generateChoices(question, 3)
   );
   const [reveal, setReveal] = useState(false);
+
+  if (showHafalan) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.background, paddingBottom: 84 }}>
+        <HafalanPerkalian onExit={() => setShowHafalan(false)} />
+      </View>
+    );
+  }
 
   const activeOp = OPS.find((o) => o.op === selectedOp) ?? OPS[0];
 
@@ -257,6 +267,28 @@ export function MateriScreen() {
                 <Text style={styles.repeatedFormula}>4 + 4 + 4 = 12</Text>
                 <Text style={styles.repeatedNote}>Angka 4 dijumlahkan sebanyak 3 kali.</Text>
               </View>
+
+              {/* Launcher to Hafalan Kali-Kali */}
+              <Pressable
+                onPress={() => {
+                  SoundService.tap();
+                  setShowHafalan(true);
+                }}
+                style={styles.hafalanBanner}
+              >
+                <View style={styles.hafalanBannerLeft}>
+                  <View style={styles.hafalanBadge}>
+                    <Text style={styles.hafalanBadgeText}>FITUR INTERAKTIF 🌟</Text>
+                  </View>
+                  <Text style={styles.hafalanBannerTitle}>Tantangan Hafalan Kali-Kali</Text>
+                  <Text style={styles.hafalanBannerSub}>
+                    Flashcard 3D, Tabel Suara, & Kuis Beruntun 1–10
+                  </Text>
+                </View>
+                <View style={styles.hafalanBannerBtn}>
+                  <Text style={styles.hafalanBannerBtnText}>Buka 🚀</Text>
+                </View>
+              </Pressable>
             </View>
           )}
 
@@ -517,4 +549,61 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(0,0,0,0.2)',
   },
   nextBtnText: { color: '#fff', fontWeight: '800', fontSize: 15 },
+  hafalanBanner: {
+    backgroundColor: '#4361EE',
+    borderRadius: radius.xl,
+    padding: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.sm,
+    borderBottomWidth: 4,
+    borderBottomColor: '#2B44BA',
+    shadowColor: '#4361EE',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  hafalanBannerLeft: {
+    flex: 1,
+    gap: 4,
+    paddingRight: 8,
+  },
+  hafalanBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    borderRadius: radius.pill,
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+  },
+  hafalanBadgeText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#fff',
+    letterSpacing: 0.5,
+  },
+  hafalanBannerTitle: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#fff',
+  },
+  hafalanBannerSub: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: 'rgba(255, 255, 255, 0.9)',
+  },
+  hafalanBannerBtn: {
+    backgroundColor: '#FFD166',
+    borderRadius: radius.pill,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderBottomWidth: 3,
+    borderBottomColor: '#D4A017',
+  },
+  hafalanBannerBtnText: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: '#4B3600',
+  },
 });
