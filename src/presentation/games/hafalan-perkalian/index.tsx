@@ -25,20 +25,21 @@ export function HafalanPerkalian({ onExit }: GameProps) {
   const [quizScore, setQuizScore] = useState(0);
   const [quizTotal, setQuizTotal] = useState(10);
   const [quizTarget, setQuizTarget] = useState<number | 'mix'>(2);
+  const [selectedCount, setSelectedCount] = useState<number>(10);
 
   const tableItems = useMemo(() => getTableItems(selectedN), [selectedN]);
   const quizQuestions = useMemo(
-    () => generateQuizQuestions(quizTarget, 10),
-    [quizTarget, inQuiz]
+    () => generateQuizQuestions(quizTarget, quizTotal),
+    [quizTarget, quizTotal, inQuiz]
   );
 
   const themeColor = MULTI_COLORS[selectedN] || colors.primary;
 
-  const startQuiz = (target: number | 'mix') => {
+  const startQuiz = (target: number | 'mix', count: number = selectedCount) => {
     SoundService.tap();
     setQuizTarget(target);
     setQuizScore(0);
-    setQuizTotal(10);
+    setQuizTotal(count);
     setQuizFinished(false);
     setInQuiz(true);
   };
@@ -91,7 +92,7 @@ export function HafalanPerkalian({ onExit }: GameProps) {
               </View>
             </View>
 
-            <Pressable style={styles.primaryActionBtn} onPress={() => startQuiz(quizTarget)}>
+            <Pressable style={styles.primaryActionBtn} onPress={() => startQuiz(quizTarget, quizTotal)}>
               <Text style={styles.primaryActionBtnText}>Ulangi Uji Hafalan ▶</Text>
             </Pressable>
 
@@ -222,25 +223,69 @@ export function HafalanPerkalian({ onExit }: GameProps) {
             Uji seberapa cepat dan lancar kamu mengingat hasil perkalian!
           </Text>
 
+          {/* Section: Pilih Jumlah Soal */}
+          <View style={styles.countSection}>
+            <Text style={styles.countSectionTitle}>Pilih Jumlah Soal:</Text>
+            <View style={styles.countSelectorRow}>
+              {([10, 20, 30] as const).map((cnt) => {
+                const isActive = selectedCount === cnt;
+                return (
+                  <Pressable
+                    key={cnt}
+                    onPress={() => {
+                      SoundService.pop();
+                      setSelectedCount(cnt);
+                    }}
+                    style={[
+                      styles.countChip,
+                      isActive && styles.countChipActive,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.countChipText,
+                        isActive && styles.countChipTextActive,
+                      ]}
+                    >
+                      {cnt === 10 ? '⚡ 10' : cnt === 20 ? '🌟 20' : '🔥 30'} Soal
+                    </Text>
+                    <Text
+                      style={[
+                        styles.countChipSub,
+                        isActive && styles.countChipSubActive,
+                      ]}
+                    >
+                      {cnt === 10 ? 'Kilat' : cnt === 20 ? 'Mantap' : 'Maraton'}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+
           <View style={styles.quizOptionsGroup}>
             <Pressable
               style={[styles.quizOptionBtn, { backgroundColor: themeColor }]}
-              onPress={() => startQuiz(selectedN)}
+              onPress={() => startQuiz(selectedN, selectedCount)}
             >
               <Text style={styles.quizOptionBtnTitle}>
                 Uji Khusus Perkalian ×{selectedN} 🚀
               </Text>
-              <Text style={styles.quizOptionBtnSub}>10 soal acak dari perkalian {selectedN}</Text>
+              <Text style={styles.quizOptionBtnSub}>
+                {selectedCount} soal khusus menguji perkalian {selectedN}
+              </Text>
             </Pressable>
 
             <Pressable
               style={[styles.quizOptionBtn, { backgroundColor: '#7209B7' }]}
-              onPress={() => startQuiz('mix')}
+              onPress={() => startQuiz('mix', selectedCount)}
             >
               <Text style={styles.quizOptionBtnTitle}>
                 🔥 Tantangan Campuran Semua Perkalian (1–10)
               </Text>
-              <Text style={styles.quizOptionBtnSub}>10 soal acak untuk menguji hafalan menyeluruh</Text>
+              <Text style={styles.quizOptionBtnSub}>
+                {selectedCount} soal acak mencakup perkalian 1 sampai 10
+              </Text>
             </Pressable>
           </View>
         </Animated.View>
@@ -351,6 +396,53 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 20,
+  },
+  countSection: {
+    width: '100%',
+    gap: 8,
+    marginTop: 6,
+  },
+  countSectionTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: colors.text,
+    textAlign: 'center',
+  },
+  countSelectorRow: {
+    flexDirection: 'row',
+    gap: 8,
+    width: '100%',
+  },
+  countChip: {
+    flex: 1,
+    backgroundColor: '#F3F4F6',
+    borderRadius: radius.md,
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+  },
+  countChipActive: {
+    backgroundColor: '#EEF2FF',
+    borderColor: '#4361EE',
+  },
+  countChipText: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: colors.textMuted,
+  },
+  countChipTextActive: {
+    color: '#4361EE',
+  },
+  countChipSub: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: colors.textMuted,
+    marginTop: 2,
+  },
+  countChipSubActive: {
+    color: '#4361EE',
   },
   quizOptionsGroup: {
     width: '100%',

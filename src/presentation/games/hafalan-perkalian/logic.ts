@@ -31,10 +31,33 @@ export function getTableItems(n: number): MultiItem[] {
 /** Generate quiz questions for a target table (1..10) or mixed */
 export function generateQuizQuestions(targetN: number | 'mix', count: number = 10): MultiQuizQuestion[] {
   const questions: MultiQuizQuestion[] = [];
+  const pairs: Array<{ a: number; b: number }> = [];
 
-  for (let i = 0; i < count; i++) {
-    const b = targetN === 'mix' ? Math.floor(Math.random() * 9) + 2 : targetN; // 2..10 or target
-    const a = Math.floor(Math.random() * 10) + 1; // 1..10
+  if (targetN !== 'mix') {
+    // For specific number N, cycle through 1..10 so all numbers in the table are tested
+    while (pairs.length < count) {
+      const fullSet = Array.from({ length: 10 }, (_, i) => ({ a: i + 1, b: targetN }));
+      fullSet.sort(() => Math.random() - 0.5);
+      pairs.push(...fullSet);
+    }
+  } else {
+    // For mixed 1..10, draw from all 100 combinations
+    const allCombos: Array<{ a: number; b: number }> = [];
+    for (let b = 1; b <= 10; b++) {
+      for (let a = 1; a <= 10; a++) {
+        allCombos.push({ a, b });
+      }
+    }
+    allCombos.sort(() => Math.random() - 0.5);
+    while (pairs.length < count) {
+      const nextBatch = [...allCombos].sort(() => Math.random() - 0.5);
+      pairs.push(...nextBatch);
+    }
+  }
+
+  const selectedPairs = pairs.slice(0, count);
+
+  selectedPairs.forEach(({ a, b }, i) => {
     const answer = a * b;
 
     // Distractors
@@ -62,7 +85,7 @@ export function generateQuizQuestions(targetN: number | 'mix', count: number = 1
     const choices = [answer, ...uniqueCandidates.slice(0, 3)].sort(() => Math.random() - 0.5);
 
     questions.push({
-      id: `mq-${i}-${Date.now().toString(36)}`,
+      id: `mq-${i}-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
       a,
       b,
       answer,
@@ -70,7 +93,7 @@ export function generateQuizQuestions(targetN: number | 'mix', count: number = 1
       prompt: `${a} × ${b} = ?`,
       hint: `${a} kelompok, masing-masing berisi ${b}`,
     });
-  }
+  });
 
   return questions;
 }
