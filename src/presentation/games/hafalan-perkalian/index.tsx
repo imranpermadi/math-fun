@@ -5,6 +5,8 @@ import { getTableItems, generateQuizQuestions, MULTI_COLORS } from './logic';
 import { FlashcardView } from './FlashcardView';
 import { TableListView } from './TableListView';
 import { QuizChallengeView } from './QuizChallengeView';
+import { ExampleProblemsView } from './ExampleProblemsView';
+import { TricksView } from './TricksView';
 import { SoundService } from '../../../core/sound/SoundService';
 import { attemptRepository } from '../../../core/di/container';
 import { useAppStore } from '../../stores/useAppStore';
@@ -17,7 +19,7 @@ export function HafalanPerkalian({ onExit }: GameProps) {
   const { earnStars } = useAppStore();
 
   const [selectedN, setSelectedN] = useState<number>(2); // Default perkalian 2
-  const [activeTab, setActiveTab] = useState<'flashcard' | 'table' | 'quiz'>('flashcard');
+  const [activeTab, setActiveTab] = useState<'flashcard' | 'table' | 'examples' | 'tricks' | 'quiz'>('flashcard');
 
   // Quiz Mode Config & State
   const [inQuiz, setInQuiz] = useState(false);
@@ -163,8 +165,12 @@ export function HafalanPerkalian({ onExit }: GameProps) {
         })}
       </ScrollView>
 
-      {/* Tab Selector: Flashcard vs Tabel vs Uji Kuis */}
-      <View style={styles.tabBar}>
+      {/* Tab Selector: Flashcard vs Tabel vs Contoh Soal vs Trik vs Uji Kuis */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.tabBarScroll}
+      >
         <Pressable
           onPress={() => {
             SoundService.tap();
@@ -192,6 +198,30 @@ export function HafalanPerkalian({ onExit }: GameProps) {
         <Pressable
           onPress={() => {
             SoundService.tap();
+            setActiveTab('examples');
+          }}
+          style={[styles.tabBtn, activeTab === 'examples' && styles.tabBtnActive]}
+        >
+          <Text style={[styles.tabBtnText, activeTab === 'examples' && styles.tabBtnTextActive]}>
+            📚 Contoh Soal
+          </Text>
+        </Pressable>
+
+        <Pressable
+          onPress={() => {
+            SoundService.tap();
+            setActiveTab('tricks');
+          }}
+          style={[styles.tabBtn, activeTab === 'tricks' && styles.tabBtnActive]}
+        >
+          <Text style={[styles.tabBtnText, activeTab === 'tricks' && styles.tabBtnTextActive]}>
+            💡 Trik Cepat
+          </Text>
+        </Pressable>
+
+        <Pressable
+          onPress={() => {
+            SoundService.tap();
             setActiveTab('quiz');
           }}
           style={[styles.tabBtn, activeTab === 'quiz' && styles.tabBtnActive]}
@@ -200,7 +230,7 @@ export function HafalanPerkalian({ onExit }: GameProps) {
             ⚔️ Uji Kuis
           </Text>
         </Pressable>
-      </View>
+      </ScrollView>
 
       {/* Tab Contents */}
       {activeTab === 'flashcard' && (
@@ -212,6 +242,18 @@ export function HafalanPerkalian({ onExit }: GameProps) {
       {activeTab === 'table' && (
         <Animated.View entering={FadeIn} style={styles.tabContent}>
           <TableListView items={tableItems} targetN={selectedN} />
+        </Animated.View>
+      )}
+
+      {activeTab === 'examples' && (
+        <Animated.View entering={FadeIn} style={styles.tabContent}>
+          <ExampleProblemsView targetN={selectedN} />
+        </Animated.View>
+      )}
+
+      {activeTab === 'tricks' && (
+        <Animated.View entering={FadeIn} style={styles.tabContent}>
+          <TricksView targetN={selectedN} />
         </Animated.View>
       )}
 
@@ -345,7 +387,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: colors.text,
   },
-  tabBar: {
+  tabBarScroll: {
     flexDirection: 'row',
     backgroundColor: '#EBE5D8',
     borderRadius: radius.pill,
@@ -353,10 +395,11 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   tabBtn: {
-    flex: 1,
     paddingVertical: 10,
+    paddingHorizontal: 16,
     borderRadius: radius.pill,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   tabBtnActive: {
     backgroundColor: colors.primary,
